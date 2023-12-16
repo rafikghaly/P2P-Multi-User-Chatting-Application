@@ -227,7 +227,7 @@ logging.basicConfig(filename="registry.log", level=logging.INFO)
 
 # as long as at least a socket exists to listen registry runs
 while inputs:
-
+    print("\033[35m")
     print("Listening for incoming connections...")
     # monitors for the incoming connections
     readable, writable, exceptional = select.select(inputs, [], [])

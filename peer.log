@@ -1,0 +1,28 @@
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 1234
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 1234
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 1234
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 1234
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 1234
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 1234
+INFO:root:Received from 192.168.1.2 -> join-success
+INFO:root:Send to 192.168.1.2:15600 -> LOGIN yehia 1234 23
+INFO:root:Received from 192.168.1.2 -> login-success
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
