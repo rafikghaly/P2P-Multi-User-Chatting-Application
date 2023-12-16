@@ -9,6 +9,7 @@ import threading
 import time
 import select
 import logging
+from hashlib import sha256
 
 # Server side of peer
 class PeerServer(threading.Thread):
@@ -402,35 +403,35 @@ class peerMain:
         # join message to create an account is composed and sent to registry
         # if response is success then informs the user for account creation
         # if response is exist then informs the user for account existence
-        message = "JOIN " + username + " " + password
+        message = "CRT:" + username + ":" + sha256(password.encode('utf-8')).hexdigest()
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
         response = self.tcpClientSocket.recv(1024).decode()
         logging.info("Received from " + self.registryName + " -> " + response)
-        if response == "join-success":
+        if response == "OK":
             print("Account created...")
-        elif response == "join-exist":
+        elif response == "EXST":
             print("choose another username or login...")
 
     # login function
     def login(self, username, password, peerServerPort):
         # a login message is composed and sent to registry
         # an integer is returned according to each response
-        message = "LOGIN " + username + " " + password + " " + str(peerServerPort)
+        message = "LOG:" + username + ":" + sha256(password.encode('utf-8')).hexdigest() + ":" + str(peerServerPort)
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
         response = self.tcpClientSocket.recv(1024).decode()
         logging.info("Received from " + self.registryName + " -> " + response)
-        if response == "login-success":
+        if response == "OK":
             print("Logged in successfully...")
             return 1
-        elif response == "login-account-not-exist":
-            print("Account does not exist...")
-            return 0
-        elif response == "login-online":
+        #elif response == "login-account-not-exist":
+            #print("Account does not exist...")
+            #return 0
+        elif response == "AON":
             print("Account is already online...")
             return 2
-        elif response == "login-wrong-password":
+        elif response == "WCRE":
             print("Wrong password...")
             return 3
     
@@ -439,7 +440,7 @@ class peerMain:
         # a logout message is composed and sent to registry
         # timer is stopped
         if option == 1:
-            message = "LOGOUT " + self.loginCredentials[0]
+            message = "LGO:" + self.loginCredentials[0]
             self.timer.cancel()
         else:
             message = "LOGOUT"

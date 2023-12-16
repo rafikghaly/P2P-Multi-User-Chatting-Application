@@ -38,14 +38,14 @@ class ClientThread(threading.Thread):
         while True:
             try:
                 # waits for incoming messages from peers
-                message = self.tcpClientSocket.recv(1024).decode().split()
+                message = self.tcpClientSocket.recv(1024).decode().split(":")
                 logging.info("Received from " + self.ip + ":" + str(self.port) + " -> " + " ".join(message))            
-                #   JOIN    #
-                if message[0] == "JOIN":
-                    # join-exist is sent to peer,
+                #   Create Account   #
+                if message[0] == "CRT":
+                    # Create Account is sent to peer,
                     # if an account with this username already exists
                     if db.is_account_exist(message[1]):
-                        response = "join-exist"
+                        response = "EXST"
                         print("From-> " + self.ip + ":" + str(self.port) + " " + response)
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)  
                         self.tcpClientSocket.send(response.encode())
@@ -53,24 +53,24 @@ class ClientThread(threading.Thread):
                     # if an account with this username is not exist, and the account is created
                     else:
                         db.register(message[1], message[2])
-                        response = "join-success"
+                        response = "OK"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())
                 #   LOGIN    #
-                elif message[0] == "LOGIN":
-                    # login-account-not-exist is sent to peer,
+                elif message[0] == "LOG":
+                    # WCRE is sent to peer,
                     # if an account with the username does not exist
                     if not db.is_account_exist(message[1]):
-                        response = "login-account-not-exist"
+                        response = "WCRE"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())
-                    # login-online is sent to peer,
+                    # AON is sent to peer,
                     # if an account with the username already online
                     elif db.is_account_online(message[1]):
-                        response = "login-online"
+                        response = "AON"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())
-                    # login-success is sent to peer,
+                    # OK is sent to peer,
                     # if an account with the username exists and not online
                     else:
                         # retrieves the account's password, and checks if the one entered by the user is correct
@@ -86,22 +86,22 @@ class ClientThread(threading.Thread):
                                 self.lock.release()
 
                             db.user_login(message[1], self.ip, message[3])
-                            # login-success is sent to peer,
+                            # OK is sent to peer,
                             # and a udp server thread is created for this peer, and thread is started
                             # timer thread of the udp server is started
-                            response = "login-success"
+                            response = "OK"
                             logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                             self.tcpClientSocket.send(response.encode())
                             self.udpServer = UDPServer(self.username, self.tcpClientSocket)
                             self.udpServer.start()
                             self.udpServer.timer.start()
-                        # if password not matches and then login-wrong-password response is sent
+                        # if password not matches and then WCRE response is sent
                         else:
-                            response = "login-wrong-password"
+                            response = "WCRE"
                             logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                             self.tcpClientSocket.send(response.encode())
                 #   LOGOUT  #
-                elif message[0] == "LOGOUT":
+                elif message[0] == "LGO":
                     # if user is online,
                     # removes the user from onlinePeers list
                     # and removes the thread for this user from tcpThreads

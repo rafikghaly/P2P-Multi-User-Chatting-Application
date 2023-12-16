@@ -26,3 +26,134 @@ INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
 INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
 INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
 INFO:root:Send to 192.168.1.2:15500 -> HELLO yehia
+INFO:root:Send to 192.168.1.2:15600 -> JOIN yehia 5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5
+INFO:root:Received from 192.168.1.2 -> join-exist
+INFO:root:Send to 192.168.1.2:15600 -> JOIN NotYehia 03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4
+INFO:root:Received from 192.168.1.2 -> join-success
+INFO:root:Send to 192.168.1.2:15600 -> LOGIN NotYehia 1234 31
+INFO:root:Received from 192.168.1.2 -> login-wrong-password
+INFO:root:Send to 192.168.1.2:15600 -> LOGIN NotYehia 03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4 31
+INFO:root:Received from 192.168.1.2 -> login-success
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15600 -> LOG:NotYehia:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4 323
+INFO:root:Send to 192.168.1.2:15600 -> LOG:NotYehia:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4 232
+INFO:root:Received from 192.168.1.2 -> WCRE
+INFO:root:Send to 192.168.1.2:15600 -> CRT:yehia:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4
+INFO:root:Received from 192.168.1.2 -> EXST
+INFO:root:Send to 192.168.1.2:15600 -> LOG:yehia:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4 232
+INFO:root:Received from 192.168.1.2 -> WCRE
+INFO:root:Send to 192.168.1.2:15600 -> LOG:NotYehia:5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5 232
+INFO:root:Received from 192.168.1.2 -> WCRE
+INFO:root:Send to 192.168.1.2:15600 -> CRT:NotYehia2:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4
+INFO:root:Received from 192.168.1.2 -> OK
+INFO:root:Send to 192.168.1.2:15600 -> LOG:NotYehia2:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4 232
+INFO:root:Received from 192.168.1.2 -> WCRE
+INFO:root:Send to 192.168.1.2:15600 -> LOG:NotYehia:03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4:232
+INFO:root:Received from 192.168.1.2 -> OK
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
+INFO:root:Send to 192.168.1.2:15500 -> HELLO NotYehia
