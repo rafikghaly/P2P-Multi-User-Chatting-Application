@@ -1,0 +1,35 @@
+1) Client to Server Protocols
+
+
+     LOG:username:password:ClientPortNo    ----> Login                                       Response:   OK or WCRE (Wrong Credentials) or AON (Already Online)
+
+     CRT:username:password  ----> Create Account                              Response:   OK or EXST (Username Exists)
+
+     GOP                    ----> Get Online peers                            Response:   NOP: [Number]\r\n
+                                                                                          Peers: [Peer1 Username]\r\n
+                                                                                          [Peer2 Username] .... and so on
+
+     LGO:[UserName]         ----> LogOut  (if online)                         Response:   No Response
+
+     LGO                    ----> LogOut  (if not online)                     Response:   No Response
+
+     SRCH:username          ----> Search i.e.:get ip address of user          Response:   IP: [IP Address] or NOTEXST
+
+     GCR                    ----> Get Available Chat Rooms                    Response:   NOCR: [Number]\r\n
+                                                                                          Rooms: [Room1 Name]\r\n
+                                                                                          [Room2 Name] .... and so on
+
+     CCR:roomname           ----> Create Chat Room                            Response:   OK or EXST
+
+     JCR:roomname           ----> Joining a chat room                         Response:   OK or NOTEXST
+
+
+2) Peer-to-Peer Protocols
+
+     REQ:[myUserName]       ----> Request to chat with peer                   Response:   OK  or  RJCT  or  BUSY
+     
+     MSG:[Message]          ----> Send a message to peer                      Response:   OK
+
+     
+
+     
