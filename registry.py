@@ -26,13 +26,16 @@ class ClientThread(threading.Thread):
         self.username = None
         self.isOnline = True
         self.udpServer = None
+        print("\033[35m")
         print("New thread started for " + ip + ":" + str(port))
 
     # main of the thread
     def run(self):
         # locks for thread which will be used for thread synchronization
         self.lock = threading.Lock()
+        print("\033[35m")
         print("Connection from: " + self.ip + ":" + str(port))
+        print("\033[35m")
         print("IP Connected: " + self.ip)
         
         while True:
@@ -46,6 +49,7 @@ class ClientThread(threading.Thread):
                     # if an account with this username already exists
                     if db.is_account_exist(message[1]):
                         response = "EXST"
+                        print("\033[35m")
                         print("From-> " + self.ip + ":" + str(self.port) + " " + response)
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)  
                         self.tcpClientSocket.send(response.encode())
@@ -115,6 +119,7 @@ class ClientThread(threading.Thread):
                                 del tcpThreads[message[1]]
                         finally:
                             self.lock.release()
+                        print("\033[35m")
                         print(self.ip + ":" + str(self.port) + " is logged out")
                         self.tcpClientSocket.close()
                         self.udpServer.timer.cancel()
@@ -123,23 +128,23 @@ class ClientThread(threading.Thread):
                         self.tcpClientSocket.close()
                         break
                 #   SEARCH  #
-                elif message[0] == "SEARCH":
+                elif message[0] == "SRCH":
                     # checks if an account with the username exists
                     if db.is_account_exist(message[1]):
                         # checks if the account is online
                         # and sends the related response to peer
                         if db.is_account_online(message[1]):
                             peer_info = db.get_peer_ip_port(message[1])
-                            response = "search-success " + peer_info[0] + ":" + peer_info[1]
+                            response = "IP: " + peer_info[0] + ":" + peer_info[1]
                             logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                             self.tcpClientSocket.send(response.encode())
                         else:
-                            response = "search-user-not-online"
+                            response = "NON"
                             logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                             self.tcpClientSocket.send(response.encode())
                     # enters if username does not exist 
                     else:
-                        response = "search-user-not-found"
+                        response = "NOTEXST"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())
             except OSError as oErr:
@@ -172,6 +177,7 @@ class UDPServer(threading.Thread):
             if self.username in tcpThreads:
                 del tcpThreads[self.username]
         self.tcpClientSocket.close()
+        print("\033[31m")
         print("Removed " + self.username + " from online peers")
 
 
@@ -183,6 +189,7 @@ class UDPServer(threading.Thread):
 
 
 # tcp and udp server port initializations
+print("\033[35m")
 print("Registy started...")
 port = 15600
 portUDP = 15500
@@ -201,8 +208,9 @@ except gaierror:
     import netifaces as ni
     host = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
 
-
+print("\033[35m")
 print("Registry IP address: " + host)
+print("\033[35m")
 print("Registry port number: " + str(port))
 
 # onlinePeers list for online account
@@ -250,6 +258,7 @@ while inputs:
                 if message[1] in tcpThreads:
                     # resets the timeout for that peer since the hello message is received
                     tcpThreads[message[1]].resetTimeout()
+                    print("\033[35m")
                     print("Hello is received from " + message[1])
                     logging.info("Received from " + clientAddress[0] + ":" + str(clientAddress[1]) + " -> " + " ".join(message))
                     

@@ -50,6 +50,7 @@ class DB:
         self.db.online_peers.insert_one(online_peer)
 
 
+
     # logs out the user 
     def user_logout(self, username):
         self.db.online_peers.delete_one({"username": username})
