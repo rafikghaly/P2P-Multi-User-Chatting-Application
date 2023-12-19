@@ -147,6 +147,17 @@ class ClientThread(threading.Thread):
                         response = "NOTEXST"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())
+
+
+                elif message[0] == "GOP":
+                    online_peers = db.get_online_peers()
+                    response = "NOP:" + str(len(online_peers)) + "\nPeers:"
+                    for peer in online_peers:
+                        response += peer
+                        response += "\n"
+                    
+                    self.tcpClientSocket.send(response.encode())     
+
             except OSError as oErr:
                 logging.error("OSError: {0}".format(oErr)) 
 
