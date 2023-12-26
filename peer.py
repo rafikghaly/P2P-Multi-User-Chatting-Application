@@ -314,12 +314,14 @@ class peerRoom:
         self.username = username
         # keeps the port number that this client should connect
         self.portList = portToConnect
+        # udp port of the peer
+        #self.peerUDPPort = 6000
         # client side tcp socket initialization
         number_of_sockets = len(self.ipList)
         socket_list = []
         for socketNum in range(number_of_sockets):
             socket_list.append(socket(AF_INET, SOCK_STREAM))
-        self.udpClientSocketList = socket(AF_INET, SOCK_DGRAM)
+        self.udpClientSocket= socket(AF_INET, SOCK_DGRAM)
         # keeps the server of this client
         self.peerServer = peerServer
         # keeps the phrase that is used when creating the client
@@ -328,6 +330,10 @@ class peerRoom:
         self.responseReceived = responseReceived
         # keeps if this client is ending the chat or not
         self.isEndingChat = False
+
+        self.udpClientSocket.bind((gethostbyname(gethostname()), 6000))
+
+
 
 
     # main method of the peer room thread
@@ -340,9 +346,11 @@ class peerRoom:
             #self.tcpClientSocket[connection].connect((self.ipList[connection], self.portList[connection]))
         while(True):
             messageSent = input(self.username + ": ")
-            for socket in self.tcpClientSocketList:
-                socket.send((self.username + ": " + messageSent).encode())
-
+          #  logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
+            for ip in self.ipList:
+                self.udpClientSocket.sendto(messageSent.encode(), (ip, 6000))
+            # for socket in self.tcpClientSocketList:
+            #     socket.send((self.username + ": " + messageSent).encode())
             if messageSent == ":q":
                 pass
         # if the server of this peer is not connected by someone else and if this is the requester side peer client then enters here
@@ -618,8 +626,10 @@ class peerMain:
         message = "JCR:" + roomName + ":" + userName
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
-        response = self.tcpClientSocket.recv(1024).decode().split("\n")
+        response = self.tcpClientSocket.recv(1024).decode().split('\n')
+        print(response)
         logging.info("Received from " + self.registryName + " -> " + response)
+
         if response[0] == "OK":
             self.isInChatRoom = True
             print("\033[34m")
@@ -636,8 +646,8 @@ class peerMain:
                 IPs.append(line[1])
                 ports.append(line[2])
             roomObj = peerRoom(IPs,ports,names,self.peerServer,None)
-            roomObj.start()
-            roomObj.join()
+            #roomObj.start()
+            #roomObj.join()
 
         elif response[0] == "NOTEXST":
             print("\033[34m")

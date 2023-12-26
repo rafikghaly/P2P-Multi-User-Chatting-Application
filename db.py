@@ -92,4 +92,4 @@ class DB:
         self.db.rooms.update_one(query,newPeer)
 
     def getRoomMembers(self,roomName):
-        return self.db.accounts.find_one({"roomName": roomName})        
+        return self.db.rooms.find_one({"roomName": roomName})

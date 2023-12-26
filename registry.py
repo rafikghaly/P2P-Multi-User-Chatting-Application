@@ -178,17 +178,24 @@ class ClientThread(threading.Thread):
                         response = "NOTEXST"
                         print("\033[35m")
                         print("From-> " + self.ip + ":" + str(self.port) + " " + response)
-                        logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)  
-                        self.tcpClientSocket.send(response.encode())       
+                        logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)
+                        self.tcpClientSocket.send(response.encode())
                     else:
+                        print('ana da5lt')
                         db.addChatRoomMember(message[1],message[2],self.ip,self.port)
                         members = db.getRoomMembers(message[1])
+                        logging.info(members)
                         IPs = members["userIPs"]
-                        names =  members["userNames"]
-                        ports = members["userPorts"]
+                        names = members["userNames"]
+                        logging.info(names)
+                        ports = str(members["userPorts"])
+                        logging.info(ports)
                         response = "OK\n"
                         for i in range(len(IPs)):
-                            response += (names[i] + ":" + IPs[i] + ":" + ports[i] + "\n") 
+                            response += (names[i] + ":" + IPs[i] + ":" + ports[i] + "\n")
+                        logging.info("ana 5alaaaaaaassssstststst")
+                       # logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)
+                        self.tcpClientSocket.send(response.encode())
 
 
 
