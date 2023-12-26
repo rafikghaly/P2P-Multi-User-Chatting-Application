@@ -182,7 +182,7 @@ class ClientThread(threading.Thread):
                         self.tcpClientSocket.send(response.encode())
                     else:
                         print('ana da5lt')
-                        db.addChatRoomMember(message[1],message[2],self.ip,self.port)
+                        db.addChatRoomMember(message[1],message[2],self.ip,message[3])
                         members = db.getRoomMembers(message[1])
                         IPs = members["userIPs"]
                         names = members["userNames"]

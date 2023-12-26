@@ -338,12 +338,14 @@ class peerRoom:
                 for s in readable:
                     if s is self.udpClientSocket:
                         try:
+                            print("I am here")
+                            print(self.udpClientSocket.recvfrom(1024))
                             data, address = self.udpClientSocket.recvfrom(1024)
                             print(f"Received message: {data.decode()} from {address}")
                             if data.decode() == ":q":
                                 break
                         except:
-                            print("A VERY BAD EXCEPTION OCCURED")
+                            pass
 
     def send_message(self):
             while True:
@@ -639,7 +641,11 @@ class peerMain:
             print("\033[0m")
 
     def joinChatRoom(self,roomName,userName):
-        message = "JCR:" + roomName + ":" + userName
+        hostname = gethostname()
+        IPAddr = gethostbyname(hostname)
+        udpSocket = socket(AF_INET,SOCK_DGRAM)
+        udpSocket.bind((IPAddr,0))
+        message = "JCR:" + roomName + ":" + userName + ":" + str(udpSocket.getsockname()[1])
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
         response = self.tcpClientSocket.recv(1024).decode().split('\n')
@@ -667,7 +673,7 @@ class peerMain:
             print("names is",names)
             print("IPs is",IPs)
             print("ports is",ports)
-            roomObj = peerRoom(IPs,ports,names,self.peerServer,None,self.udpClientSocket)
+            roomObj = peerRoom(IPs,ports,names,self.peerServer,None,udpSocket)
             print("Room Will Run...")
             roomObj.run()
 
