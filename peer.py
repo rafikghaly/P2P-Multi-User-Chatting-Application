@@ -306,7 +306,7 @@ class PeerClient(threading.Thread):
                 self.tcpClientSocket.close()
                 
 class peerRoom:
-    def __init__(self, ipToConnect, portToConnect, username, peerServer, responseReceived):
+    def __init__(self, ipToConnect, portToConnect, username, peerServer, responseReceived,peerServerUdpPort):
         threading.Thread.__init__(self)
         # keeps the ip address of the peer that this will connect
         self.ipList = ipToConnect
@@ -330,32 +330,46 @@ class peerRoom:
         self.responseReceived = responseReceived
         # keeps if this client is ending the chat or not
         self.isEndingChat = False
+        self.peerserverudpport =peerServerUdpPort
+        self.udpClientSocket.bind((gethostbyname(gethostname()), self.peerserverudpport))
 
-        self.udpClientSocket.bind((gethostbyname(gethostname()), 6000))
+    def receive_message(self):
+            inputs = [self.udpClientSocket]
+            while inputs:
+                readable, writable, exceptional = select.select(inputs, [], [])
+                for s in readable:
+                    if s is self.udpClientSocket:
+                        data, address = self.udpClientSocket.recvfrom(1024)
+                        print(f"Received message: {data.decode()} from {address}")
+                        if data.decode() == ":q":
+                            break
 
+    def send_message(self):
+            while True:
+                messageSent = input("You" + ": ")
+                #logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
+                for ip, port in zip(self.ipList, self.portList):
+                    self.udpClientSocket.sendto(messageSent.encode(), (ip, int(port)))
 
-
+                # for socket in self.tcpClientSocketList:
+                #     socket.send((self.username + ": " + messageSent).encode())
+                if messageSent == ":q":
+                    pass
 
     # main method of the peer room thread
     def run(self):
         print("\033[34m")
         print("Room started...")
         print("\033[0m")
-        # connects to the server of other peer
-        #for connection in range(self.ipList):
-            #self.tcpClientSocket[connection].connect((self.ipList[connection], self.portList[connection]))
-        while(True):
-            messageSent = input(self.username + ": ")
-          #  logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
-            for ip in self.ipList:
-                self.udpClientSocket.sendto(messageSent.encode(), (ip, 6000))
-            # for socket in self.tcpClientSocketList:
-            #     socket.send((self.username + ": " + messageSent).encode())
-            if messageSent == ":q":
-                pass
-        # if the server of this peer is not connected by someone else and if this is the requester side peer client then enters here
-        
-                
+        send_thread = threading.Thread(target=self.send_message)
+        receive_thread = threading.Thread(target=self.receive_message)
+
+        send_thread.start()
+        receive_thread.start()
+
+        send_thread.join()
+        receive_thread.join()
+
 # main process of the peer
 class peerMain:
 
@@ -628,7 +642,7 @@ class peerMain:
         self.tcpClientSocket.send(message.encode())
         response = self.tcpClientSocket.recv(1024).decode().split('\n')
         print(response)
-        logging.info("Received from " + self.registryName + " -> " + response)
+        logging.info("Received from " + self.registryName + " -> " + str(response))
 
         if response[0] == "OK":
             self.isInChatRoom = True
@@ -638,16 +652,19 @@ class peerMain:
             IPs = list()
             names = list()
             ports = list()
+            myport = None
+            print(response)
             for line in response[1:]:
                 line = line.split(":")
                 if line[0] == self.loginCredentials[0]: #Don't let user create a socket with himself
+                    myport = line[2]
                     continue
                 names.append(line[0])
                 IPs.append(line[1])
                 ports.append(line[2])
-            roomObj = peerRoom(IPs,ports,names,self.peerServer,None)
-            #roomObj.start()
-            #roomObj.join()
+            roomObj = peerRoom(IPs,ports,names,self.peerServer,None,int(myport))
+            print("Room Will Run...")
+            roomObj.run()
 
         elif response[0] == "NOTEXST":
             print("\033[34m")

@@ -184,18 +184,29 @@ class ClientThread(threading.Thread):
                         print('ana da5lt')
                         db.addChatRoomMember(message[1],message[2],self.ip,self.port)
                         members = db.getRoomMembers(message[1])
-                        logging.info(members)
                         IPs = members["userIPs"]
                         names = members["userNames"]
-                        logging.info(names)
-                        ports = str(members["userPorts"])
-                        logging.info(ports)
+                        ports = members["userPorts"]
+                        # logging.info(members)
+                        # logging.info(str(IPs))
+                        # logging.info(names)
+                        # logging.info(ports)
+                        # logging.info("Length of IPs: " + str(len(IPs)))
+                        # logging.info("Length of names: " + str(len(names)))
+                        # logging.info("Length of ports: " + str(len(ports)))
+
                         response = "OK\n"
                         for i in range(len(IPs)):
-                            response += (names[i] + ":" + IPs[i] + ":" + ports[i] + "\n")
-                        logging.info("ana 5alaaaaaaassssstststst")
-                       # logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)
-                        self.tcpClientSocket.send(response.encode())
+                            response += (names[i] + ":" + str(IPs[i]) + ":" + str(ports[i]))
+                            if i < len(IPs) - 1:  # If it's not the last iteration
+                                response += "\n"
+
+                        logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + str(response))
+                        try:
+                            self.tcpClientSocket.send(response.encode())
+                        except Exception as e:
+                            logging.error("Error sending message: " + str(e))
+
 
 
 
