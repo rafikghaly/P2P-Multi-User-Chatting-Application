@@ -157,9 +157,26 @@ class ClientThread(threading.Thread):
                         response += "\n"
                     
                     self.tcpClientSocket.send(response.encode())     
+                
+                elif message[0] == "CCR":
+                    if db.is_roomName_exist(message[1]):
+                        response = "EXST"
+                        print("\033[35m")
+                        print("From-> " + self.ip + ":" + str(self.port) + " " + response)
+                        logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)  
+                        self.tcpClientSocket.send(response.encode())
+                    # join-success is sent to peer,
+                    # if an account with this username is not exist, and the account is created
+                    else:
+                        db.createChatRoom(message[1],message[2],self.ip)
+                        response = "OK"
+                        logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
+                        self.tcpClientSocket.send(response.encode())                    
+
 
             except OSError as oErr:
-                logging.error("OSError: {0}".format(oErr)) 
+                pass
+                #logging.error("OSError: {0}".format(oErr)) 
 
 
     # function for resettin the timeout for the udp timer thread

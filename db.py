@@ -68,5 +68,18 @@ class DB:
             online_peers_list.append(online_peer['username'])
         return online_peers_list
     
-miniDB = DB()
-print(miniDB.get_online_peers())
+    def is_roomName_exist(self,roomName):
+        if self.db.chatRooms.count_documents({'roomName': roomName}) > 0:
+            return True
+        else:
+            return False        
+
+    # Create Chat Room
+    def createChatRoom(self, roomName,userName,userIP):
+        room = {
+            "roomName": roomName,
+            "userNames": userName,
+            "userIPs" : userIP
+        }
+        self.db.rooms.insert_one(room)
+
