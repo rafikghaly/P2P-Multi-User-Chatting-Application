@@ -75,11 +75,12 @@ class DB:
             return False        
 
     # Create Chat Room
-    def createChatRoom(self, roomName,userName,userIP):
+    def createChatRoom(self, roomName,userName,userIP,userPort):
         room = {
             "roomName": roomName,
             "userNames": userName,
-            "userIPs" : userIP
+            "userIPs": userIP,
+            "userPorts": userPort
         }
         self.db.rooms.insert_one(room)
 

@@ -315,7 +315,11 @@ class peerRoom:
         # keeps the port number that this client should connect
         self.portToConnect = portToConnect
         # client side tcp socket initialization
-        self.tcpClientSocket = socket(AF_INET, SOCK_STREAM)
+        number_of_sockets = len(ipToConnect)
+        socket_list = []
+        for sockets in range(number_of_sockets):
+            socket_list.append(socket(AF_INET, SOCK_STREAM))
+        self.tcpClientSocket = socket_list
         # keeps the server of this client
         self.peerServer = peerServer
         # keeps the phrase that is used when creating the client
@@ -329,10 +333,11 @@ class peerRoom:
     # main method of the peer client thread
     def run(self):
         print("\033[34m")
-        print("Peer client started...")
+        print("Room started...")
         print("\033[0m")
         # connects to the server of other peer
-        self.tcpClientSocket.connect((self.ipToConnect, self.portToConnect))
+        for connections in range(self.ipToConnect):
+            self.tcpClientSocket[connections].connect((self.ipToConnect, self.portToConnect))
         # if the server of this peer is not connected by someone else and if this is the requester side peer client then enters here
         if self.peerServer.isChatRequested == 0 and self.responseReceived is None:
             # composes a request message and this is sent to server and then this waits a response message from the server this client connects

@@ -3,3 +3,4 @@ peer.log
 __pycache__
 venv
 .idea
+*.log

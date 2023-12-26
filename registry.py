@@ -168,7 +168,7 @@ class ClientThread(threading.Thread):
                     # join-success is sent to peer,
                     # if an account with this username is not exist, and the account is created
                     else:
-                        db.createChatRoom(message[1],message[2],self.ip)
+                        db.createChatRoom(message[1],message[2],self.ip,self.port)
                         response = "OK"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())                    
