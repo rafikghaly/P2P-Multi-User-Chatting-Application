@@ -69,7 +69,7 @@ class DB:
         return online_peers_list
     
     def is_roomName_exist(self,roomName):
-        if self.db.chatRooms.count_documents({'roomName': roomName}) > 0:
+        if self.db.rooms.count_documents({'roomName': roomName}) > 0:
             return True
         else:
             return False        
@@ -78,9 +78,18 @@ class DB:
     def createChatRoom(self, roomName,userName,userIP,userPort):
         room = {
             "roomName": roomName,
-            "userNames": userName,
-            "userIPs": userIP,
-            "userPorts": userPort
+            "userNames": [userName],
+            "userIPs": [userIP],
+            "userPorts": [userPort]
         }
         self.db.rooms.insert_one(room)
 
+    def addChatRoomMember(self,roomName,userName,userIP,userPort):
+        query = {'roomName': roomName}
+        newPeer = {"$push":{"userNames" : userName,
+                            "userIPs" : userIP,
+                            "userPorts" : userPort}}
+        self.db.rooms.update_one(query,newPeer)
+
+    def getRoomMembers(self,roomName):
+        return self.db.accounts.find_one({"roomName": roomName})        

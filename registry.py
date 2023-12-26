@@ -171,7 +171,25 @@ class ClientThread(threading.Thread):
                         db.createChatRoom(message[1],message[2],self.ip,self.port)
                         response = "OK"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
-                        self.tcpClientSocket.send(response.encode())                    
+                        self.tcpClientSocket.send(response.encode())
+
+                elif message[0] == "JCR":
+                    if not db.is_roomName_exist(message[1]):
+                        response = "NOTEXST"
+                        print("\033[35m")
+                        print("From-> " + self.ip + ":" + str(self.port) + " " + response)
+                        logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response)  
+                        self.tcpClientSocket.send(response.encode())       
+                    else:
+                        db.addChatRoomMember(message[1],message[2],self.ip,self.port)
+                        members = db.getRoomMembers(message[1])
+                        IPs = members["userIPs"]
+                        names =  members["userNames"]
+                        ports = members["userPorts"]
+                        response = "OK\n"
+                        for i in range(len(IPs)):
+                            response += (names[i] + ":" + IPs[i] + ":" + ports[i] + "\n") 
+
 
 
             except OSError as oErr:
