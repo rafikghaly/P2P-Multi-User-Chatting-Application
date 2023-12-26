@@ -306,7 +306,7 @@ class PeerClient(threading.Thread):
                 self.tcpClientSocket.close()
                 
 class peerRoom:
-    def __init__(self, ipToConnect, portToConnect, username, peerServer, responseReceived,peerServerUdpPort):
+    def __init__(self, ipToConnect, portToConnect, username, peerServer, responseReceived,peerUdpSocket):
         threading.Thread.__init__(self)
         # keeps the ip address of the peer that this will connect
         self.ipList = ipToConnect
@@ -321,7 +321,6 @@ class peerRoom:
         socket_list = []
         for socketNum in range(number_of_sockets):
             socket_list.append(socket(AF_INET, SOCK_STREAM))
-        self.udpClientSocket= socket(AF_INET, SOCK_DGRAM)
         # keeps the server of this client
         self.peerServer = peerServer
         # keeps the phrase that is used when creating the client
@@ -330,8 +329,7 @@ class peerRoom:
         self.responseReceived = responseReceived
         # keeps if this client is ending the chat or not
         self.isEndingChat = False
-        self.peerserverudpport =peerServerUdpPort
-        self.udpClientSocket.bind((gethostbyname(gethostname()), self.peerserverudpport))
+        self.udpClientSocket = peerUdpSocket
 
     def receive_message(self):
             inputs = [self.udpClientSocket]
@@ -339,16 +337,20 @@ class peerRoom:
                 readable, writable, exceptional = select.select(inputs, [], [])
                 for s in readable:
                     if s is self.udpClientSocket:
-                        data, address = self.udpClientSocket.recvfrom(1024)
-                        print(f"Received message: {data.decode()} from {address}")
-                        if data.decode() == ":q":
-                            break
+                        try:
+                            data, address = self.udpClientSocket.recvfrom(1024)
+                            print(f"Received message: {data.decode()} from {address}")
+                            if data.decode() == ":q":
+                                break
+                        except:
+                            print("A VERY BAD EXCEPTION OCCURED")
 
     def send_message(self):
             while True:
                 messageSent = input("You" + ": ")
                 #logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
                 for ip, port in zip(self.ipList, self.portList):
+                    print("Sent to",ip,"and port",port)
                     self.udpClientSocket.sendto(messageSent.encode(), (ip, int(port)))
 
                 # for socket in self.tcpClientSocketList:
@@ -643,7 +645,7 @@ class peerMain:
         response = self.tcpClientSocket.recv(1024).decode().split('\n')
         print(response)
         logging.info("Received from " + self.registryName + " -> " + str(response))
-
+      
         if response[0] == "OK":
             self.isInChatRoom = True
             print("\033[34m")
@@ -662,7 +664,10 @@ class peerMain:
                 names.append(line[0])
                 IPs.append(line[1])
                 ports.append(line[2])
-            roomObj = peerRoom(IPs,ports,names,self.peerServer,None,int(myport))
+            print("names is",names)
+            print("IPs is",IPs)
+            print("ports is",ports)
+            roomObj = peerRoom(IPs,ports,names,self.peerServer,None,self.udpClientSocket)
             print("Room Will Run...")
             roomObj.run()
 
