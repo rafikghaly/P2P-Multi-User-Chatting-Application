@@ -348,7 +348,7 @@ class peerRoom:
                             data, address = self.udpClientSocket.recvfrom(1024)
                             decoded = data.decode()
                             splitted = decoded.split(":")
-                            print(f"Received message: {decoded}")
+
                             if splitted[0] == "JUPDT":
                                 self.ipList.append(splitted[2])
                                 self.portList.append(splitted[3])
@@ -363,20 +363,22 @@ class peerRoom:
                                     self.ipList.pop(index)
                                     self.portList.pop(index)
                                 print(splitted[1], "was removed")
+                            else:
+                                print(f"Received message: {decoded}")
                         except:
                             pass
 
     def send_message(self):
             while self.isInChatRoom:
-                messageSent = input("You" + ": ")
-                for ip, port in zip(self.ipList, self.portList):
-                    self.udpClientSocket.sendto((self.username + ":" + messageSent).encode(), (ip, int(port)))
-
+                messageSent = input()
                 if messageSent == ":q":
                     self.isInChatRoom = False
                     remove = "XUPDT:" + self.roomName + ":" + self.username + ":" + str(self.udpClientSocket.getsockname()[1])
                     self.peerTCPsocket.send(remove.encode())
                     logging.info("Exit is sent")
+                else:
+                    for ip, port in zip(self.ipList, self.portList):
+                        self.udpClientSocket.sendto((self.username + ":" + messageSent).encode(), (ip, int(port)))
 
 
     # main method of the peer room thread
@@ -386,13 +388,12 @@ class peerRoom:
         print("\033[0m")
         send_thread = threading.Thread(target=self.send_message)
         receive_thread = threading.Thread(target=self.receive_message)
-        stop_receive = StoppableThread()
         send_thread.start()
         receive_thread.start()
 
         send_thread.join()
         logging.info("Send Thread STopped")
-        receive_thread.join()
+        receive_thread.join(0.1)
         logging.info("Recieve thred stoppped")
 
 # main process of the peer
@@ -433,15 +434,20 @@ class peerMain:
         # as long as the user is not logged out, asks to select an option in the menu
         while choice != "3":
             # menu selection prompt
-            choice = input('''\033[34m Choose: \n
-                           Create account: 1\n
-                           Login: 2\n
-                           Logout: 3\n
-                           Search: 4\n
-                           Start a chat: 5\n
-                           Get Online Peers: 6\n
-                           Create a Chat Room: 7\n
-                           Join a chat Room: 8\n\033[0m''')
+            if not self.isOnline:
+                choice = input('''\033[34m Choose: \n
+Create account: 1\n
+Login: 2\n
+Logout: 3\n
+ \033[0m''')
+            else:
+                choice = input('''\033[34m Choose: \n
+Logout: 3\n
+Search: 4\n
+Start a chat: 5\n
+Get Online Peers: 6\n
+Create a Chat Room: 7\n
+Join a chat Room: 8\n\033[0m''')                
 
             # if choice is 1, creates an account with the username
             # and password entered by the user
@@ -556,11 +562,11 @@ class peerMain:
         response = self.tcpClientSocket.recv(1024).decode()
         logging.info("Received from " + self.registryName + " -> " + response)
         if response == "OK":
-            print("\033[34m")
+            print("\033[91m")
             print("Account created...")
             print("\033[0m")
         elif response == "EXST":
-            print("\033[34m")
+            print("\033[31m")
             print("choose another username or login...")
             print("\033[0m")
 
@@ -574,7 +580,7 @@ class peerMain:
         response = self.tcpClientSocket.recv(1024).decode()
         logging.info("Received from " + self.registryName + " -> " + response)
         if response == "OK":
-            print("\033[34m")
+            print("\033[92m")
             print("Logged in successfully...")
             print("\033[0m")
             return 1
@@ -582,7 +588,7 @@ class peerMain:
             #print("Account does not exist...")
             #return 0
         elif response == "AON":
-            print("\033[34m")
+            print("\033[31m")
             print("Account is already online...")
             print("\033[0m")
             return 2
@@ -663,7 +669,7 @@ class peerMain:
             roomObj.run()
             print("\033[0m")
         elif response == "EXST":
-            print("\033[34m")
+            print("\033[31m")
             print("Chat Room Name Already Exists")
             print("\033[0m")
 
@@ -703,7 +709,7 @@ class peerMain:
 
 
         elif response[0] == "NOTEXST":
-            print("\033[34m")
+            print("\033[31m")
             print("Chat Room Doesn't Exist")
             print("\033[0m")
     # function for sending hello message
