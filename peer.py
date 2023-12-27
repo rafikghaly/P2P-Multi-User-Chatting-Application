@@ -306,20 +306,6 @@ class PeerClient(threading.Thread):
                 self.tcpClientSocket.close()
                 
 
-class StoppableThread(threading.Thread):
-    def __init__(self):
-        super().__init__()
-        self.stop_event = threading.Event()
-    def run(self):
-        while not self.stop_event.is_set():
-            print("Thread is running...")
-            time.sleep(1)
-
-    def stop(self):
-        self.stop_event.set()
-
-
-
 class peerRoom:
     def __init__(self, ipToConnect, portToConnect, username,peerUdpSocket,peerTCPsocket,roomName):
         threading.Thread.__init__(self)
@@ -340,7 +326,7 @@ class peerRoom:
     def receive_message(self):
             inputs = [self.udpClientSocket]
             while inputs and self.isInChatRoom:
-                readable, writable, exceptional = select.select(inputs, [], [])
+                readable, writable, exceptional = select.select(inputs, [], [],0.1)
                 for s in readable:
                     if s is self.udpClientSocket:
                         try:
@@ -348,7 +334,9 @@ class peerRoom:
                             data, address = self.udpClientSocket.recvfrom(1024)
                             decoded = data.decode()
                             splitted = decoded.split(":")
-                            print(f"Received message: {decoded}")
+                            print("\033[96m")
+                            print(f"{decoded}")
+                            print("\033[00m")
                             if splitted[0] == "JUPDT":
                                 self.ipList.append(splitted[2])
                                 self.portList.append(splitted[3])
@@ -368,7 +356,7 @@ class peerRoom:
 
     def send_message(self):
             while self.isInChatRoom:
-                messageSent = input("You" + ": ")
+                messageSent = input("")
                 for ip, port in zip(self.ipList, self.portList):
                     self.udpClientSocket.sendto((self.username + ":" + messageSent).encode(), (ip, int(port)))
 
@@ -386,7 +374,6 @@ class peerRoom:
         print("\033[0m")
         send_thread = threading.Thread(target=self.send_message)
         receive_thread = threading.Thread(target=self.receive_message)
-        stop_receive = StoppableThread()
         send_thread.start()
         receive_thread.start()
 
@@ -441,7 +428,8 @@ class peerMain:
                            Start a chat: 5\n
                            Get Online Peers: 6\n
                            Create a Chat Room: 7\n
-                           Join a chat Room: 8\n\033[0m''')
+                           Join a chat Room: 8\n
+                           Search Available Chat Rooms: 9\n\033[0m''')
 
             # if choice is 1, creates an account with the username
             # and password entered by the user
@@ -518,7 +506,10 @@ class peerMain:
 
             elif choice is "8" and self.isOnline:
                 roomName = input("\033[34m Enter the name of the chat room: ")
-                self.joinChatRoom(roomName,self.loginCredentials[0])                
+                self.joinChatRoom(roomName,self.loginCredentials[0])  
+
+            elif choice is "9" and self.isOnline:
+                self.getAvailableChatRoom()               
             # if this is the receiver side then it will get the prompt to accept an incoming request during the main loop
             # that's why response is evaluated in main process not the server thread even though the prompt is printed by server
             # if the response is ok then a client is created for this peer with the OK message and that's why it will directly
@@ -720,6 +711,14 @@ class peerMain:
         self.timer = threading.Timer(1, self.sendHelloMessage)
         self.timer.start()
 
+    def getAvailableChatRoom(self):
+        # Ask Registry to return usernames of online peers
+        message = "GCR"
+        logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
+        self.tcpClientSocket.send(message.encode())
+        response = self.tcpClientSocket.recv(1024).decode()
+        logging.info("Received from " + self.registryName + " -> " + " ".join(response))
+        print(response)              
 
 
 # peer is started
