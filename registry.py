@@ -168,7 +168,7 @@ class ClientThread(threading.Thread):
                     # join-success is sent to peer,
                     # if an account with this username is not exist, and the account is created
                     else:
-                        db.createChatRoom(message[1],message[2],self.ip,self.port)
+                        db.createChatRoom(message[1],message[2],self.ip,message[3])
                         response = "OK"
                         logging.info("Send to " + self.ip + ":" + str(self.port) + " -> " + response) 
                         self.tcpClientSocket.send(response.encode())
@@ -194,6 +194,18 @@ class ClientThread(threading.Thread):
                         # logging.info("Length of IPs: " + str(len(IPs)))
                         # logging.info("Length of names: " + str(len(names)))
                         # logging.info("Length of ports: " + str(len(ports)))
+                        hostname = gethostname()
+                        IPAddr = gethostbyname(hostname)
+                        udpSocket = socket(AF_INET,SOCK_DGRAM)
+                        udpSocket.bind((IPAddr,0))
+                        for i in range(len(IPs)):
+                            if names[i] == message[2]:
+                                continue
+                            update = "JUPDT:" + message[2] + ":" + self.ip + ":" + str(message[3])
+                            print("message is ",update)
+                            print("IP is ",IPs[i], "port is ",ports[i])
+                            udpSocket.sendto(update.encode(),(IPs[i],int(ports[i])))
+
 
                         response = "OK\n"
                         for i in range(len(IPs)):

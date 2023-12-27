@@ -338,12 +338,19 @@ class peerRoom:
                 for s in readable:
                     if s is self.udpClientSocket:
                         try:
-                            print("I am here")
-                            print(self.udpClientSocket.recvfrom(1024))
+                            #print(self.udpClientSocket.recvfrom(1024))
                             data, address = self.udpClientSocket.recvfrom(1024)
-                            print(f"Received message: {data.decode()} from {address}")
-                            if data.decode() == ":q":
+                            decoded = data.decode()
+                            splitted = decoded.split(":")
+                            print(f"Received message: {decoded}")
+                            if decoded  == ":q":
                                 break
+                            elif splitted[0] == "JUPDT":
+                                self.ipList.append(splitted[2])
+                                self.portList.append(splitted[3])
+                                print(splitted[1],":Joined The Room!!!!!")
+
+
                         except:
                             pass
 
@@ -353,7 +360,7 @@ class peerRoom:
                 #logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
                 for ip, port in zip(self.ipList, self.portList):
                     print("Sent to",ip,"and port",port)
-                    self.udpClientSocket.sendto(messageSent.encode(), (ip, int(port)))
+                    self.udpClientSocket.sendto((self.username + ":" + messageSent).encode(), (ip, int(port)))
 
                 # for socket in self.tcpClientSocketList:
                 #     socket.send((self.username + ": " + messageSent).encode())
@@ -624,8 +631,11 @@ class peerMain:
 
     
     def createChatRoom(self,roomName,userName):
-
-        message = "CCR:" + roomName + ":" + userName
+        hostname = gethostname()
+        IPAddr = gethostbyname(hostname)
+        udpSocket = socket(AF_INET,SOCK_DGRAM)
+        udpSocket.bind((IPAddr,0))
+        message = "CCR:" + roomName + ":" + userName + ":" + str(udpSocket.getsockname()[1])
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
         response = self.tcpClientSocket.recv(1024).decode()
@@ -634,6 +644,9 @@ class peerMain:
             self.isInChatRoom = True
             print("\033[34m")
             print(roomName," created...")
+            roomObj = peerRoom([],[],self.loginCredentials[0],self.peerServer,None,udpSocket)
+            print("Room Will Run...")
+            roomObj.run()
             print("\033[0m")
         elif response == "EXST":
             print("\033[34m")
@@ -649,7 +662,7 @@ class peerMain:
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
         response = self.tcpClientSocket.recv(1024).decode().split('\n')
-        print(response)
+    
         logging.info("Received from " + self.registryName + " -> " + str(response))
       
         if response[0] == "OK":
@@ -659,9 +672,9 @@ class peerMain:
             print("\033[0m")
             IPs = list()
             names = list()
+            myname = self.loginCredentials[0]
             ports = list()
             myport = None
-            print(response)
             for line in response[1:]:
                 line = line.split(":")
                 if line[0] == self.loginCredentials[0]: #Don't let user create a socket with himself
@@ -670,10 +683,7 @@ class peerMain:
                 names.append(line[0])
                 IPs.append(line[1])
                 ports.append(line[2])
-            print("names is",names)
-            print("IPs is",IPs)
-            print("ports is",ports)
-            roomObj = peerRoom(IPs,ports,names,self.peerServer,None,udpSocket)
+            roomObj = peerRoom(IPs,ports,myname,self.peerServer,None,udpSocket)
             print("Room Will Run...")
             roomObj.run()
 
