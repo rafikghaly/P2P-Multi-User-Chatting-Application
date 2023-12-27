@@ -93,3 +93,12 @@ class DB:
 
     def getRoomMembers(self,roomName):
         return self.db.rooms.find_one({"roomName": roomName})
+
+    def removeRoomMember(self,roomName,userName,IP,port):
+        self.db.rooms.update_one({'roomName': roomName}, {'$pull': {'userNames': userName,
+                                                                    'userIPs': IP,
+                                                                    'userPorts':port}})
+        
+    def removeRoom(self,roomName):
+        self.db.rooms.delete_one({'roomName':roomName})
+

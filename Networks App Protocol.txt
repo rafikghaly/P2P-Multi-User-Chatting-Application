@@ -15,6 +15,8 @@
 
      SRCH:username          ----> Search i.e.:get ip address of user          Response:   IP: [IP Address] or NOTEXST
 
+2) Chat Room Protocols
+
      GCR                    ----> Get Available Chat Rooms                    Response:   NOCR: [Number]\r\n
                                                                                           Rooms: [Room1 Name]\r\n
                                                                                           [Room2 Name] .... and so on
@@ -23,8 +25,17 @@
 
      JCR:roomname           ----> Joining a chat room                         Response:   OK or NOTEXST
 
+     JUPDT:username:IP:port          ----> New User joined the room                    No Response
+     (from server to peers) 
 
-2) Peer-to-Peer Protocols
+     
+     XUPDT:roomName:username:port                  ----> User Left Chat Room                         No Response
+     (peer to server)
+     (server to peers)
+     
+
+
+3) Peer-to-Peer Protocols
 
      REQ:[myUserName]       ----> Request to chat with peer                   Response:   OK  or  RJCT  or  BUSY
      

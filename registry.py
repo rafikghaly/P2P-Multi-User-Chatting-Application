@@ -22,6 +22,10 @@ class ClientThread(threading.Thread):
         self.port = port
         # socket of the peer
         self.tcpClientSocket = tcpClientSocket
+        hostname = gethostname()
+        IPAddr = gethostbyname(hostname)
+        self.udpSocket = socket(AF_INET,SOCK_DGRAM) #udp socket for chat room broadcasting
+        self.udpSocket.bind((IPAddr,0))
         # username, online status and udp server initializations
         self.username = None
         self.isOnline = True
@@ -194,19 +198,14 @@ class ClientThread(threading.Thread):
                         # logging.info("Length of IPs: " + str(len(IPs)))
                         # logging.info("Length of names: " + str(len(names)))
                         # logging.info("Length of ports: " + str(len(ports)))
-                        hostname = gethostname()
-                        IPAddr = gethostbyname(hostname)
-                        udpSocket = socket(AF_INET,SOCK_DGRAM)
-                        udpSocket.bind((IPAddr,0))
+
                         for i in range(len(IPs)):
                             if names[i] == message[2]:
                                 continue
                             update = "JUPDT:" + message[2] + ":" + self.ip + ":" + str(message[3])
                             print("message is ",update)
                             print("IP is ",IPs[i], "port is ",ports[i])
-                            udpSocket.sendto(update.encode(),(IPs[i],int(ports[i])))
-
-
+                            self.udpSocket.sendto(update.encode(),(IPs[i],int(ports[i])))
                         response = "OK\n"
                         for i in range(len(IPs)):
                             response += (names[i] + ":" + str(IPs[i]) + ":" + str(ports[i]))
@@ -219,8 +218,19 @@ class ClientThread(threading.Thread):
                         except Exception as e:
                             logging.error("Error sending message: " + str(e))
 
-
-
+                elif message[0] == "XUPDT":
+                    members = db.getRoomMembers(message[1])
+                    IPs = members["userIPs"]
+                    names = members["userNames"]
+                    ports = members["userPorts"]
+                    remove = "XUPDT:" + message[2]+ ":" + self.ip + ":" + str(message[3])
+                    db.removeRoomMember(message[1],message[2],self.ip,message[3])
+                    for i in range(len(IPs)):
+                        if names[i] == message[2]:
+                            continue
+                        self.udpSocket.sendto(remove.encode(),(IPs[i],int(ports[i])))
+                    if len(IPs) == 1:
+                        db.removeRoom(message[1])
 
             except OSError as oErr:
                 pass

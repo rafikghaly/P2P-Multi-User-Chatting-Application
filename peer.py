@@ -305,8 +305,23 @@ class PeerClient(threading.Thread):
                 self.responseReceived = None
                 self.tcpClientSocket.close()
                 
+
+class StoppableThread(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.stop_event = threading.Event()
+    def run(self):
+        while not self.stop_event.is_set():
+            print("Thread is running...")
+            time.sleep(1)
+
+    def stop(self):
+        self.stop_event.set()
+
+
+
 class peerRoom:
-    def __init__(self, ipToConnect, portToConnect, username, peerServer, responseReceived,peerUdpSocket):
+    def __init__(self, ipToConnect, portToConnect, username,peerUdpSocket,peerTCPsocket,roomName):
         threading.Thread.__init__(self)
         # keeps the ip address of the peer that this will connect
         self.ipList = ipToConnect
@@ -315,25 +330,16 @@ class peerRoom:
         # keeps the port number that this client should connect
         self.portList = portToConnect
         # udp port of the peer
-        #self.peerUDPPort = 6000
-        # client side tcp socket initialization
-        number_of_sockets = len(self.ipList)
-        socket_list = []
-        for socketNum in range(number_of_sockets):
-            socket_list.append(socket(AF_INET, SOCK_STREAM))
+        self.peerTCPsocket = peerTCPsocket
         # keeps the server of this client
-        self.peerServer = peerServer
-        # keeps the phrase that is used when creating the client
-        # if the client is created with a phrase, it means this one received the request
-        # this phrase should be none if this is the client of the requester peer
-        self.responseReceived = responseReceived
         # keeps if this client is ending the chat or not
-        self.isEndingChat = False
+        self.isInChatRoom = True
         self.udpClientSocket = peerUdpSocket
+        self.roomName = roomName
 
     def receive_message(self):
             inputs = [self.udpClientSocket]
-            while inputs:
+            while inputs and self.isInChatRoom:
                 readable, writable, exceptional = select.select(inputs, [], [])
                 for s in readable:
                     if s is self.udpClientSocket:
@@ -343,29 +349,35 @@ class peerRoom:
                             decoded = data.decode()
                             splitted = decoded.split(":")
                             print(f"Received message: {decoded}")
-                            if decoded  == ":q":
-                                break
-                            elif splitted[0] == "JUPDT":
+                            if splitted[0] == "JUPDT":
                                 self.ipList.append(splitted[2])
                                 self.portList.append(splitted[3])
                                 print(splitted[1],":Joined The Room!!!!!")
-
-
+                            elif splitted[0] == "XUPDT":
+                                index = -1
+                                for i in range(self.IPs):
+                                    if self.ipList[i] == splitted[2] and self.portList[i] == int(splitted[3]):
+                                        index = i
+                                        break
+                                if index != -1:
+                                    self.ipList.pop(index)
+                                    self.portList.pop(index)
+                                print(splitted[1], "was removed")
                         except:
                             pass
 
     def send_message(self):
-            while True:
+            while self.isInChatRoom:
                 messageSent = input("You" + ": ")
-                #logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
                 for ip, port in zip(self.ipList, self.portList):
-                    print("Sent to",ip,"and port",port)
                     self.udpClientSocket.sendto((self.username + ":" + messageSent).encode(), (ip, int(port)))
 
-                # for socket in self.tcpClientSocketList:
-                #     socket.send((self.username + ": " + messageSent).encode())
                 if messageSent == ":q":
-                    pass
+                    self.isInChatRoom = False
+                    remove = "XUPDT:" + self.roomName + ":" + self.username + ":" + str(self.udpClientSocket.getsockname()[1])
+                    self.peerTCPsocket.send(remove.encode())
+                    logging.info("Exit is sent")
+
 
     # main method of the peer room thread
     def run(self):
@@ -374,12 +386,14 @@ class peerRoom:
         print("\033[0m")
         send_thread = threading.Thread(target=self.send_message)
         receive_thread = threading.Thread(target=self.receive_message)
-
+        stop_receive = StoppableThread()
         send_thread.start()
         receive_thread.start()
 
         send_thread.join()
+        logging.info("Send Thread STopped")
         receive_thread.join()
+        logging.info("Recieve thred stoppped")
 
 # main process of the peer
 class peerMain:
@@ -644,7 +658,7 @@ class peerMain:
             self.isInChatRoom = True
             print("\033[34m")
             print(roomName," created...")
-            roomObj = peerRoom([],[],self.loginCredentials[0],self.peerServer,None,udpSocket)
+            roomObj = peerRoom([],[],self.loginCredentials[0],udpSocket,self.tcpClientSocket,roomName)
             print("Room Will Run...")
             roomObj.run()
             print("\033[0m")
@@ -683,9 +697,10 @@ class peerMain:
                 names.append(line[0])
                 IPs.append(line[1])
                 ports.append(line[2])
-            roomObj = peerRoom(IPs,ports,myname,self.peerServer,None,udpSocket)
+            roomObj = peerRoom(IPs,ports,myname,udpSocket,self.tcpClientSocket,roomName)
             print("Room Will Run...")
             roomObj.run()
+
 
         elif response[0] == "NOTEXST":
             print("\033[34m")
@@ -693,6 +708,11 @@ class peerMain:
             print("\033[0m")
     # function for sending hello message
     # a timer thread is used to send hello messages to udp socket of registry
+            
+    def exitChatRoom(self,userName):
+        message = "XUPDT:" + userName
+        self.tcpClientSocket.send(message.encode())
+
     def sendHelloMessage(self):
         message = "HELLO " + self.loginCredentials[0]
         logging.info("Send to " + self.registryName + ":" + str(self.registryUDPPort) + " -> " + message)
