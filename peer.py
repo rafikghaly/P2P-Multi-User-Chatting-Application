@@ -433,7 +433,8 @@ Search: 4\n
 Start a chat: 5\n
 Get Online Peers: 6\n
 Create a Chat Room: 7\n
-Join a chat Room: 8\n\033[0m''')                
+Join a chat Room: 8\n
+View Chat Rooms: 9\n\033[0m''')                
 
             # if choice is 1, creates an account with the username
             # and password entered by the user
