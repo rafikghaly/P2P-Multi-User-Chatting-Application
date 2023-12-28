@@ -42,7 +42,7 @@ class PeerServer(threading.Thread):
     # main method of the peer server thread
     def run(self):
 
-        print("\033[34m")
+        print("\033[91m")
         print("Peer server started...")
         print("\033[0m")
 
@@ -330,7 +330,6 @@ class peerRoom:
                 for s in readable:
                     if s is self.udpClientSocket:
                         try:
-                            #print(self.udpClientSocket.recvfrom(1024))
                             data, address = self.udpClientSocket.recvfrom(1024)
                             decoded = data.decode()
                             splitted = decoded.split(":")
@@ -338,19 +337,23 @@ class peerRoom:
                             if splitted[0] == "JUPDT":
                                 self.ipList.append(splitted[2])
                                 self.portList.append(splitted[3])
+                                print("\033[92m")
                                 print(splitted[1],":Joined The Room!!!!!")
+                                print("\033[0m")
                             elif splitted[0] == "XUPDT":
                                 index = -1
-                                for i in range(self.IPs):
-                                    if self.ipList[i] == splitted[2] and self.portList[i] == int(splitted[3]):
+                                for i in range(len(self.ipList)):
+                                    if self.ipList[i] == splitted[2] and int(self.portList[i]) == int(splitted[3]):
                                         index = i
                                         break
                                 if index != -1:
                                     self.ipList.pop(index)
                                     self.portList.pop(index)
-                                print(splitted[1], "was removed")
+                                print("\033[31m")
+                                print(splitted[1], "has left the room :(")
+                                print("\033[0m")
                             else:
-                                print(f"Received message: {decoded}")
+                                print(f"{decoded}")
                         except:
                             pass
 
@@ -369,9 +372,6 @@ class peerRoom:
 
     # main method of the peer room thread
     def run(self):
-        print("\033[34m")
-        print("Room started...")
-        print("\033[0m")
         send_thread = threading.Thread(target=self.send_message)
         receive_thread = threading.Thread(target=self.receive_message)
         send_thread.start()
@@ -388,7 +388,7 @@ class peerMain:
     # peer initializations
     def __init__(self):
         # ip address of the registry
-        self.registryName = input("\033[34m Enter IP address of registry: \033[0m")
+        self.registryName = input("\033[34mEnter IP address of registry: \033[0m")
         #self.registryName = 'localhost'
         # port number of the registry
         self.registryPort = 15600
@@ -421,13 +421,13 @@ class peerMain:
         while choice != "3":
             # menu selection prompt
             if not self.isOnline:
-                choice = input('''\033[34m Choose: \n
+                choice = input('''\033[34mChoose: \n
 Create account: 1\n
 Login: 2\n
 Logout: 3\n
  \033[0m''')
             else:
-                choice = input('''\033[34m Choose: \n
+                choice = input('''\033[34mChoose: \n
 Logout: 3\n
 Search: 4\n
 Start a chat: 5\n
@@ -471,7 +471,7 @@ Join a chat Room: 8\n\033[0m''')
                 self.peerServer.tcpServerSocket.close()
                 if self.peerClient is not None:
                     self.peerClient.tcpClientSocket.close()
-                print("\033[34m")
+                print("\033[92m")
                 print("Logged out successfully")
                 print("\033[0m")
             # is peer is not logged in and exits the program
@@ -480,11 +480,11 @@ Join a chat Room: 8\n\033[0m''')
             # if choice is 4 and user is online, then user is asked
             # for a username that is wanted to be searched
             elif choice == "4" and self.isOnline:
-                username = input("\033[34m  Username to be searched: ")
+                username = input("\033[34mUsername to be searched: ")
                 searchStatus = self.searchUser(username)
                 # if user is found its ip address is shown to user
                 if searchStatus is not None and searchStatus != 0:
-                    print("\033[34m")
+                    print("\033[92m")
                     print("IP address of " + username + " is " + searchStatus)
                     print("\033[0m")
             # if choice is 5 and user is online, then user is asked
@@ -551,7 +551,7 @@ Join a chat Room: 8\n\033[0m''')
         response = self.tcpClientSocket.recv(1024).decode()
         logging.info("Received from " + self.registryName + " -> " + response)
         if response == "OK":
-            print("\033[91m")
+            print("\033[92m")
             print("Account created...")
             print("\033[0m")
         elif response == "EXST":
@@ -613,7 +613,7 @@ Join a chat Room: 8\n\033[0m''')
 
         #ip?
         if response[0] == "IP:":
-            print("\033[34m")
+            print("\033[92m")
             print(username + " is found successfully...")
             print("\033[0m")
             return response[1]
@@ -651,10 +651,9 @@ Join a chat Room: 8\n\033[0m''')
         logging.info("Received from " + self.registryName + " -> " + response)
         if response == "OK":
             self.isInChatRoom = True
-            print("\033[34m")
+            print("\033[92m")
             print(roomName," created...")
             roomObj = peerRoom([],[],self.loginCredentials[0],udpSocket,self.tcpClientSocket,roomName)
-            print("Room Will Run...")
             roomObj.run()
             print("\033[0m")
         elif response == "EXST":
@@ -676,7 +675,7 @@ Join a chat Room: 8\n\033[0m''')
       
         if response[0] == "OK":
             self.isInChatRoom = True
-            print("\033[34m")
+            print("\033[92m")
             print("Welcome to ",roomName," Chat Room, Say Hi")
             print("\033[0m")
             IPs = list()
@@ -693,7 +692,6 @@ Join a chat Room: 8\n\033[0m''')
                 IPs.append(line[1])
                 ports.append(line[2])
             roomObj = peerRoom(IPs,ports,myname,udpSocket,self.tcpClientSocket,roomName)
-            print("Room Will Run...")
             roomObj.run()
 
 
@@ -716,7 +714,7 @@ Join a chat Room: 8\n\033[0m''')
         self.timer.start()
 
     def getAvailableChatRoom(self):
-        # Ask Registry to return usernames of online peers
+        # Ask Registry to return list of available rooms
         message = "GCR"
         logging.info("Send to " + self.registryName + ":" + str(self.registryPort) + " -> " + message)
         self.tcpClientSocket.send(message.encode())
