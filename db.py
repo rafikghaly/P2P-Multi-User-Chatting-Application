@@ -95,10 +95,27 @@ class DB:
         return self.db.rooms.find_one({"roomName": roomName})
 
     def removeRoomMember(self,roomName,userName,IP,port):
-        self.db.rooms.update_one({'roomName': roomName}, {'$pull': {'userNames': userName,
-                                                                    'userIPs': IP,
-                                                                    'userPorts':port}})
+        # Get the room document
+        room = self.db.rooms.find_one({'roomName': roomName})
+        print(f"Before update: {room}\n")
+        if userName in room['userNames']:
+            index = room['userNames'].index(userName)
+            room['userNames'].pop(index)
+            room['userIPs'].pop(index)
+            room['userPorts'].pop(index)
+            self.db.rooms.update_one({'roomName': roomName}, {'$set': room})
+            room = self.db.rooms.find_one({'roomName': roomName})
+            print(f"After update: {room}")
         
     def removeRoom(self,roomName):
         self.db.rooms.delete_one({'roomName':roomName})
 
+    def getRooms(self):
+        chatroom = list()
+        for chat in self.db.rooms.find():
+            chatroom.append(chat['roomName'])
+        #print(chatroom)
+        return chatroom
+# db = DB()
+# db.getRooms()
+# db.removeRoomMember("room","rafik2","192.168.1.106","49733")

@@ -232,6 +232,13 @@ class ClientThread(threading.Thread):
                     if len(IPs) == 1:
                         db.removeRoom(message[1])
 
+                elif message[0] =="GCR":
+                    chatrooms = db.getRooms()
+                    response = "NOCR:" + str(len(chatrooms)) + "\nRooms:"
+                    for room in chatrooms:
+                        response += room
+                        response += "\n"    
+                    self.tcpClientSocket.send(response.encode())  
             except OSError as oErr:
                 pass
                 #logging.error("OSError: {0}".format(oErr)) 
