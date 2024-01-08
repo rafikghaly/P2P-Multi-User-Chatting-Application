@@ -24,6 +24,8 @@ class PeerServer(threading.Thread):
         self.tcpServerSocket = socket(AF_INET, SOCK_STREAM)
         # port number of the peer server
         self.peerServerPort = peerServerPort
+
+        self.isInChatRoom = 0
         # if 1, then user is already chatting with someone
         # if 0, then user is not chatting with anyone
         self.isChatRequested = 0
@@ -82,9 +84,9 @@ class PeerServer(threading.Thread):
                         # if the user is not chatting, then the ip and the socket of
                         # this peer is assigned to server variables
                         if self.isChatRequested == 0:
-                            print("\033[34m")
-                            print(self.username + " is connected from " + str(addr))
-                            print("\033[0m")
+                            #print("\033[34m")
+                            #print(self.username + " is connected from " + str(addr))
+                            #print("\033[0m")
                             self.connectedPeerSocket = connected
                             self.connectedPeerIP = addr[0]
                     # if the socket that receives the data is the one that
@@ -100,7 +102,7 @@ class PeerServer(threading.Thread):
                             # text for proper input choices is printed however OK or REJECT is taken as input in main process of the peer
                             # if the socket that we received the data belongs to the peer that we are chatting with,
                             # enters here
-                            if s is self.connectedPeerSocket:
+                            if not self.isInChatRoom and s is self.connectedPeerSocket:
                                 # parses the message
                                 messageReceived = messageReceived.split()
                                 # gets the port of the peer that sends the chat request message
@@ -118,7 +120,7 @@ class PeerServer(threading.Thread):
                                 self.isChatRequested = 1
                             # if the socket that we received the data does not belong to the peer that we are chatting with
                             # and if the user is already chatting with someone else(isChatRequested = 1), then enters here
-                            elif s is not self.connectedPeerSocket and self.isChatRequested == 1:
+                            elif self.isInChatRoom or (s is not self.connectedPeerSocket and self.isChatRequested == 1):
                                 # sends a busy message to the peer that sends a chat request when this peer is 
                                 # already chatting with someone else
                                 message = "BUSY"
@@ -425,7 +427,7 @@ class peerMain:
 Create account: 1\n
 Login: 2\n
 Logout: 3\n
- \033[0m''')
+\033[0m''')
             else:
                 choice = input('''\033[34mChoose: \n
 Logout: 3\n
@@ -439,15 +441,15 @@ View Chat Rooms: 9\n\033[0m''')
             # if choice is 1, creates an account with the username
             # and password entered by the user
             if choice == "1":
-                username = input("\033[34m username: \033[0m")
-                password = input("\033[34m password: \033[0m")
+                username = input("\033[34musername: \033[0m")
+                password = input("\033[34mpassword: \033[0m")
                 
                 self.createAccount(username, password)
             # if choice is 2 and user is not logged in, asks for the username
             # and the password to login
             elif choice == "2" and not self.isOnline:
-                username = input("\033[34m username: \033[0m")
-                password = input("\033[34m password: \033[0m")
+                username = input("\033[34musername: \033[0m")
+                password = input("\033[34mpassword: \033[0m")
                 # asks for the port number for server's tcp socket
                 peerServerPort = int(input("\033[34m Enter a port number for peer server: \033[0m"))
                 
@@ -491,7 +493,7 @@ View Chat Rooms: 9\n\033[0m''')
             # if choice is 5 and user is online, then user is asked
             # to enter the username of the user that is wanted to be chatted
             elif choice == "5" and self.isOnline:
-                username = input("\033[34m Enter the username of user to start chat: ")
+                username = input("\033[34mEnter the username of user to start chat: ")
                 searchStatus = self.searchUser(username)
                 # if searched user is found, then its ip address and port number is retrieved
                 # and a client thread is created
@@ -505,12 +507,12 @@ View Chat Rooms: 9\n\033[0m''')
                 self.getOnlineUsers()
 
             elif choice is "7" and self.isOnline:
-                roomName = input("\033[34m Enter the name of the chat room: ")
+                roomName = input("\033[34mEnter the name of the chat room: ")
                 self.createChatRoom(roomName,self.loginCredentials[0])
 
 
             elif choice is "8" and self.isOnline:
-                roomName = input("\033[34m Enter the name of the chat room: ")
+                roomName = input("\033[34mEnter the name of the chat room: ")
                 self.joinChatRoom(roomName,self.loginCredentials[0])  
 
             elif choice is "9" and self.isOnline:
@@ -520,22 +522,26 @@ View Chat Rooms: 9\n\033[0m''')
             # if the response is ok then a client is created for this peer with the OK message and that's why it will directly
             # sent an OK message to the requesting side peer server and waits for the user input
             # main process waits for the client thread to finish its chat
-            elif choice == "OK" and self.isOnline:
+            elif choice.upper() == "OK" and self.isOnline:
                 okMessage = "OK " + self.loginCredentials[0]
                 logging.info("Send to " + self.peerServer.connectedPeerIP + " -> " + okMessage)
                 self.peerServer.connectedPeerSocket.send(okMessage.encode())
                 self.peerClient = PeerClient(self.peerServer.connectedPeerIP, self.peerServer.connectedPeerPort , self.loginCredentials[0], self.peerServer, "OK")
                 self.peerClient.start()
                 self.peerClient.join()
-            # if user rejects the chat request then reject message is sent to the requester side
-            elif choice == "REJECT" and self.isOnline:
-                self.peerServer.connectedPeerSocket.send("REJECT".encode())
-                self.peerServer.isChatRequested = 0
-                logging.info("Send to " + self.peerServer.connectedPeerIP + " -> REJECT")
+
             # if choice is cancel timer for hello message is cancelled
             elif choice == "CANCEL":
                 self.timer.cancel()
                 break
+
+            elif self.isOnline:
+                if self.peerServer.connectedPeerSocket != None:
+                    self.peerServer.connectedPeerSocket.send("REJECT".encode())
+                    self.peerServer.isChatRequested = 0
+                    logging.info("Send to " + self.peerServer.connectedPeerIP + " -> REJECT")
+                else:
+                    print("Invalid Choice, Try Again\n")
         # if main process is not ended with cancel selection
         # socket of the client is closed
         if choice != "CANCEL":
@@ -654,8 +660,10 @@ View Chat Rooms: 9\n\033[0m''')
             self.isInChatRoom = True
             print("\033[92m")
             print(roomName," created...")
+            self.peerServer.isInChatRoom = True
             roomObj = peerRoom([],[],self.loginCredentials[0],udpSocket,self.tcpClientSocket,roomName)
             roomObj.run()
+            self.peerServer.isInChatRoom = False
             print("\033[0m")
         elif response == "EXST":
             print("\033[31m")
@@ -692,9 +700,10 @@ View Chat Rooms: 9\n\033[0m''')
                 names.append(line[0])
                 IPs.append(line[1])
                 ports.append(line[2])
+            self.peerServer.isInChatRoom = True
             roomObj = peerRoom(IPs,ports,myname,udpSocket,self.tcpClientSocket,roomName)
             roomObj.run()
-
+            self.peerServer.isInChatRoom = False
 
         elif response[0] == "NOTEXST":
             print("\033[31m")
